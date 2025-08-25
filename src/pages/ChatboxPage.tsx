@@ -59,6 +59,37 @@ const BlueSelectionPanel = styled.div`
     width: 300px;
     padding: 16px;
   }
+
+  /* Custom Scrollbar Styling */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 8px 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.6) 100%);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    &:active {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.7) 100%);
+    }
+  }
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.1);
 `;
 
 const GreenChatbox = styled.div`
@@ -460,9 +491,20 @@ const ChatboxPage: React.FC = () => {
       return;
     }
 
-    // Rotalarım sayfasına yönlendir (şimdilik alert)
-    alert(`Seçimleriniz tamamlandı! ${selectedCount} öğe seçildi. Rotalarım sayfasına yönlendiriliyorsunuz...`);
-    navigate('/', { state: { selections } });
+    // Başarı mesajı göster
+    const botMessage: Message = {
+      id: Date.now(),
+      text: `🎉 Harika! ${selectedCount} öğe seçtiniz. Rotalarım sayfasına yönlendiriliyorsunuz...`,
+      isUser: false,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, botMessage]);
+
+    // 2 saniye bekle ve yönlendir
+    setTimeout(() => {
+      navigate('/routes', { state: { selections } });
+    }, 2000);
   };
 
   const handleSendMessage = (text?: string) => {

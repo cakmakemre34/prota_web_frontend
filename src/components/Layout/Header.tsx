@@ -298,17 +298,17 @@ const Header: React.FC<HeaderProps> = ({
           >
             Ana Sayfa
           </NavLink>
-          <NavLink onClick={() => handleNavigation('#routes')} isScrolled={isScrolled}>
-            Rotalar
-          </NavLink>
-          <NavLink onClick={() => handleNavigation('#destinations')} isScrolled={isScrolled}>
-            Destinasyonlar
+          <NavLink onClick={() => navigate('/routes')} isScrolled={isScrolled}>
+            Rotalarım
           </NavLink>
           <NavLink onClick={() => handleNavigation('#group-travel')} isScrolled={isScrolled}>
             Toplu Seyahat
           </NavLink>
-          <NavLink onClick={() => handleNavigation('#contact')} isScrolled={isScrolled}>
-            İletişim
+          <NavLink onClick={() => handleNavigation('#popular-routes')} isScrolled={isScrolled}>
+            Popüler Rotalar
+          </NavLink>
+          <NavLink onClick={() => navigate('/chatbox')} isScrolled={isScrolled}>
+            Chatbox
           </NavLink>
         </Nav>
 
