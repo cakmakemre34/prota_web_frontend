@@ -45,3 +45,4 @@ export interface Business {
   createdAt: string;
   updatedAt: string;
 }
+

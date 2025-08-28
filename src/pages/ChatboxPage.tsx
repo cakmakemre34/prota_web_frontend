@@ -19,12 +19,30 @@ const RedHeader = styled.div`
   padding: 0 24px;
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: ${breakpoints.tablet}) {
+    padding: 0 16px;
+    height: 70px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0 12px;
+    height: 60px;
+  }
 `;
 
 const HeaderTitle = styled.h1`
   font-size: 24px;
   font-weight: bold;
   margin: 0;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 `;
 
 const BackButton = styled.button`
@@ -39,25 +57,88 @@ const BackButton = styled.button`
   &:hover {
     background: rgba(255, 255, 255, 0.3);
   }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+`;
+
+const MobileToggleButton = styled.button`
+  display: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    display: flex;
+  }
+`;
+
+const MobileOverlay = styled.div<{ isVisible?: boolean }>`
+  display: none;
+  
+  @media (max-width: ${breakpoints.tablet}) {
+    display: ${props => props.isVisible ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
 `;
 
 const MainContent = styled.div`
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    flex-direction: column;
+  }
 `;
 
-const BlueSelectionPanel = styled.div`
+const BlueSelectionPanel = styled.div<{ isVisible?: boolean }>`
   width: 350px;
   background: linear-gradient(180deg, ${colors.primary} 0%, ${colors.primaryDark} 100%);
   color: white;
   padding: 24px;
   overflow-y: auto;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
 
   @media (max-width: ${breakpoints.tablet}) {
-    width: 300px;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 400px;
     padding: 16px;
+    z-index: 1000;
+    transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(-100%)'};
+    box-shadow: ${props => props.isVisible ? '4px 0 20px rgba(0, 0, 0, 0.3)' : 'none'};
+  }
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+    width: 85%;
+    top: 60px;
   }
 
   /* Custom Scrollbar Styling */
@@ -98,6 +179,15 @@ const GreenChatbox = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    height: calc(100vh - 70px);
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    height: calc(100vh - 60px);
+  }
 `;
 
 // Selection Panel Components
@@ -125,26 +215,130 @@ const CategoryTitle = styled.h3`
 const SelectionItem = styled.div<{ selected?: boolean }>`
   background: ${props => props.selected ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
   border: 1px solid ${props => props.selected ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.2)'};
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 12px;
   transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
+
+  ${props => props.selected && `
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: ${colors.primary};
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  `}
+`;
+
+const ItemImage = styled.img`
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+`;
+
+const ItemContent = styled.div`
+  padding: 12px;
 `;
 
 const ItemName = styled.div`
   font-weight: 600;
   margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 1.3;
 `;
 
 const ItemPrice = styled.div`
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.8;
+  font-weight: 500;
+`;
+
+const ItemDescription = styled.div`
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+  line-height: 1.2;
+`;
+
+const ItemActions = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: ${breakpoints.tablet}) {
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 6px;
+  }
+`;
+
+const ActionButton = styled.button<{ variant?: 'select' | 'details' }>`
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    padding: 6px 8px;
+    font-size: 11px;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 6px;
+    font-size: 10px;
+  }
+  
+  ${props => props.variant === 'select' ? `
+    background: rgba(34, 197, 94, 0.2);
+    color: white;
+    border-color: rgba(34, 197, 94, 0.4);
+    
+    &:hover {
+      background: rgba(34, 197, 94, 0.3);
+      border-color: rgba(34, 197, 94, 0.6);
+    }
+  ` : `
+    background: rgba(59, 130, 246, 0.2);
+    color: white;
+    border-color: rgba(59, 130, 246, 0.4);
+    
+    &:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+  `}
+
+  &:active {
+    transform: scale(0.95);
+  }
 `;
 
 const CompleteButton = styled.button`
@@ -280,6 +474,18 @@ const InputContainer = styled.div`
   padding: 8px 16px;
   margin: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+
+  @media (max-width: ${breakpoints.tablet}) {
+    margin: 12px;
+    padding: 6px 12px;
+    gap: 8px;
+    border-radius: 20px;
+  }
+
+  @media (max-width: 480px) {
+    margin: 8px;
+    padding: 4px 8px;
+  }
 `;
 
 const MessageInput = styled.input`
@@ -383,6 +589,7 @@ interface SelectionItem {
   name: string;
   price: string;
   description?: string;
+  image: string;
 }
 
 interface Selections {
@@ -390,6 +597,17 @@ interface Selections {
   restaurant: SelectionItem | null;
   activity: SelectionItem | null;
   transport: SelectionItem | null;
+}
+
+interface UserPreferences {
+  destination?: string;
+  budget?: string;
+  duration?: string;
+  interests?: string[];
+  accommodation?: string;
+  food?: string;
+  transport?: string;
+  travelStyle?: string;
 }
 
 const ChatboxPage: React.FC = () => {
@@ -414,29 +632,108 @@ const ChatboxPage: React.FC = () => {
     transport: null
   });
   
+  // Add missing state variables
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
+  const [conversationStep, setConversationStep] = useState<'destination' | 'budget' | 'duration' | 'interests' | 'accommodation' | 'food' | 'transport' | 'travelStyle' | 'complete'>('destination');
+  
+  // Mobile panel visibility state
+  const [isPanelVisible, setIsPanelVisible] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Sample data
+  // Sample data with images
   const sampleData = {
     hotels: [
-      { id: 'h1', name: 'Grand Palace Hotel', price: '₺2,500/gece', description: '5 yıldızlı lüks otel' },
-      { id: 'h2', name: 'City Center Hotel', price: '₺1,200/gece', description: '4 yıldızlı şehir merkezi' },
-      { id: 'h3', name: 'Budget Inn', price: '₺600/gece', description: '3 yıldızlı ekonomik' },
+      { 
+        id: 'h1', 
+        name: 'Grand Palace Hotel', 
+        price: '₺2,500/gece', 
+        description: '5 yıldızlı lüks otel',
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'h2', 
+        name: 'City Center Hotel', 
+        price: '₺1,200/gece', 
+        description: '4 yıldızlı şehir merkezi',
+        image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'h3', 
+        name: 'Budget Inn', 
+        price: '₺600/gece', 
+        description: '3 yıldızlı ekonomik',
+        image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=300&h=200&fit=crop&crop=center'
+      },
     ],
     restaurants: [
-      { id: 'r1', name: 'Sunset Restaurant', price: '₺200/kişi', description: 'Deniz manzaralı restoran' },
-      { id: 'r2', name: 'Local Taste', price: '₺120/kişi', description: 'Yerel lezzetler' },
-      { id: 'r3', name: 'Fast Food Corner', price: '₺60/kişi', description: 'Hızlı servis' },
+      { 
+        id: 'r1', 
+        name: 'Sunset Restaurant', 
+        price: '₺200/kişi', 
+        description: 'Deniz manzaralı restoran',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'r2', 
+        name: 'Local Taste', 
+        price: '₺120/kişi', 
+        description: 'Yerel lezzetler',
+        image: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'r3', 
+        name: 'Fast Food Corner', 
+        price: '₺60/kişi', 
+        description: 'Hızlı servis',
+        image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=300&h=200&fit=crop&crop=center'
+      },
     ],
     activities: [
-      { id: 'a1', name: 'Şehir Turu', price: '₺150/kişi', description: 'Rehberli şehir gezisi' },
-      { id: 'a2', name: 'Müze Ziyareti', price: '₺80/kişi', description: 'Tarihi müzeler' },
-      { id: 'a3', name: 'Tekne Turu', price: '₺300/kişi', description: 'Boğaz turu' },
+      { 
+        id: 'a1', 
+        name: 'Şehir Turu', 
+        price: '₺150/kişi', 
+        description: 'Rehberli şehir gezisi',
+        image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'a2', 
+        name: 'Müze Ziyareti', 
+        price: '₺80/kişi', 
+        description: 'Tarihi müzeler',
+        image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 'a3', 
+        name: 'Tekne Turu', 
+        price: '₺300/kişi', 
+        description: 'Boğaz turu',
+        image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=200&fit=crop&crop=center'
+      },
     ],
     transport: [
-      { id: 't1', name: 'Özel Araç', price: '₺800/gün', description: 'Şoförlü araç' },
-      { id: 't2', name: 'Taksi', price: '₺200/mesafe', description: 'Taksi hizmeti' },
-      { id: 't3', name: 'Toplu Taşıma', price: '₺50/gün', description: 'Otobüs-metro' },
+      { 
+        id: 't1', 
+        name: 'Özel Araç', 
+        price: '₺800/gün', 
+        description: 'Şoförlü araç',
+        image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 't2', 
+        name: 'Taksi', 
+        price: '₺200/mesafe', 
+        description: 'Taksi hizmeti',
+        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&h=200&fit=crop&crop=center'
+      },
+      { 
+        id: 't3', 
+        name: 'Toplu Taşıma', 
+        price: '₺50/gün', 
+        description: 'Otobüs-metro',
+        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=300&h=200&fit=crop&crop=center'
+      },
     ]
   };
 
@@ -463,8 +760,13 @@ const ChatboxPage: React.FC = () => {
   const handleSelectionChange = (category: keyof Selections, item: SelectionItem) => {
     setSelections(prev => ({
       ...prev,
-      [category]: prev[category]?.id === item.id ? null : item
+      [category]: item // Aynı kategoriden başka seçenek seçilirse eskisi otomatik iptal olur
     }));
+
+    // Mobilde panel seçim sonrası kapansın
+    if (window.innerWidth <= 768) {
+      setIsPanelVisible(false);
+    }
 
     // Seçim değişikliğini chatbox'a bildir
     const categoryNames = {
@@ -476,7 +778,25 @@ const ChatboxPage: React.FC = () => {
 
     const botMessage: Message = {
       id: Date.now(),
-      text: `${categoryNames[category]} seçiminiz güncellendi: ${item.name} (${item.price})`,
+      text: `${categoryNames[category]} seçildi: ${item.name} (${item.price})`,
+      isUser: false,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, botMessage]);
+  };
+
+  const handleShowDetails = (item: SelectionItem, category: string) => {
+    const categoryNames = {
+      hotel: 'Otel',
+      restaurant: 'Restoran', 
+      activity: 'Aktivite',
+      transport: 'Ulaşım'
+    };
+
+    const botMessage: Message = {
+      id: Date.now(),
+      text: `${categoryNames[category as keyof typeof categoryNames]} detayları: ${item.name} - ${item.price}. ${item.description || 'Daha fazla bilgi için bizimle iletişime geçin!'}`,
       isUser: false,
       timestamp: new Date()
     };
@@ -573,16 +893,27 @@ const ChatboxPage: React.FC = () => {
     <ChatboxContainer>
       {/* Red Header */}
       <RedHeader>
-        <HeaderTitle>🧳 Seyahat Planlama Asistanı</HeaderTitle>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <MobileToggleButton onClick={() => setIsPanelVisible(!isPanelVisible)}>
+            {isPanelVisible ? '✕' : '☰'} Seçenekler
+          </MobileToggleButton>
+          <HeaderTitle>🧳 Seyahat Planlama Asistanı</HeaderTitle>
+        </div>
         <BackButton onClick={() => navigate('/')}>
           ← Ana Sayfa
         </BackButton>
       </RedHeader>
 
+      {/* Mobile Overlay */}
+      <MobileOverlay 
+        isVisible={isPanelVisible} 
+        onClick={() => setIsPanelVisible(false)} 
+      />
+
       {/* Main Content */}
       <MainContent>
         {/* Blue Selection Panel */}
-        <BlueSelectionPanel>
+        <BlueSelectionPanel isVisible={isPanelVisible}>
           <SelectionTitle>Seçimlerinizi Yapın</SelectionTitle>
           
           {/* Hotels */}
@@ -592,10 +923,33 @@ const ChatboxPage: React.FC = () => {
               <SelectionItem
                 key={hotel.id}
                 selected={selections.hotel?.id === hotel.id}
-                onClick={() => handleSelectionChange('hotel', hotel)}
               >
-                <ItemName>{hotel.name}</ItemName>
-                <ItemPrice>{hotel.price}</ItemPrice>
+                <ItemImage src={hotel.image} alt={hotel.name} />
+                <ItemContent>
+                  <ItemName>{hotel.name}</ItemName>
+                  <ItemPrice>{hotel.price}</ItemPrice>
+                  <ItemDescription>{hotel.description}</ItemDescription>
+                  <ItemActions>
+                    <ActionButton 
+                      variant="select" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectionChange('hotel', hotel);
+                      }}
+                    >
+                      ✓ Seç
+                    </ActionButton>
+                    <ActionButton 
+                      variant="details"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowDetails(hotel, 'hotel');
+                      }}
+                    >
+                      🔍 Detayları Görüntüle
+                    </ActionButton>
+                  </ItemActions>
+                </ItemContent>
               </SelectionItem>
             ))}
           </SelectionCategory>
@@ -607,10 +961,33 @@ const ChatboxPage: React.FC = () => {
               <SelectionItem
                 key={restaurant.id}
                 selected={selections.restaurant?.id === restaurant.id}
-                onClick={() => handleSelectionChange('restaurant', restaurant)}
               >
-                <ItemName>{restaurant.name}</ItemName>
-                <ItemPrice>{restaurant.price}</ItemPrice>
+                <ItemImage src={restaurant.image} alt={restaurant.name} />
+                <ItemContent>
+                  <ItemName>{restaurant.name}</ItemName>
+                  <ItemPrice>{restaurant.price}</ItemPrice>
+                  <ItemDescription>{restaurant.description}</ItemDescription>
+                  <ItemActions>
+                    <ActionButton 
+                      variant="select" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectionChange('restaurant', restaurant);
+                      }}
+                    >
+                      ✓ Seç
+                    </ActionButton>
+                    <ActionButton 
+                      variant="details"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowDetails(restaurant, 'restaurant');
+                      }}
+                    >
+                      🔍 Detayları Görüntüle
+                    </ActionButton>
+                  </ItemActions>
+                </ItemContent>
               </SelectionItem>
             ))}
           </SelectionCategory>
@@ -622,10 +999,33 @@ const ChatboxPage: React.FC = () => {
               <SelectionItem
                 key={activity.id}
                 selected={selections.activity?.id === activity.id}
-                onClick={() => handleSelectionChange('activity', activity)}
               >
-                <ItemName>{activity.name}</ItemName>
-                <ItemPrice>{activity.price}</ItemPrice>
+                <ItemImage src={activity.image} alt={activity.name} />
+                <ItemContent>
+                  <ItemName>{activity.name}</ItemName>
+                  <ItemPrice>{activity.price}</ItemPrice>
+                  <ItemDescription>{activity.description}</ItemDescription>
+                  <ItemActions>
+                    <ActionButton 
+                      variant="select" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectionChange('activity', activity);
+                      }}
+                    >
+                      ✓ Seç
+                    </ActionButton>
+                    <ActionButton 
+                      variant="details"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowDetails(activity, 'activity');
+                      }}
+                    >
+                      🔍 Detayları Görüntüle
+                    </ActionButton>
+                  </ItemActions>
+                </ItemContent>
               </SelectionItem>
             ))}
           </SelectionCategory>
@@ -637,10 +1037,33 @@ const ChatboxPage: React.FC = () => {
               <SelectionItem
                 key={transport.id}
                 selected={selections.transport?.id === transport.id}
-                onClick={() => handleSelectionChange('transport', transport)}
               >
-                <ItemName>{transport.name}</ItemName>
-                <ItemPrice>{transport.price}</ItemPrice>
+                <ItemImage src={transport.image} alt={transport.name} />
+                <ItemContent>
+                  <ItemName>{transport.name}</ItemName>
+                  <ItemPrice>{transport.price}</ItemPrice>
+                  <ItemDescription>{transport.description}</ItemDescription>
+                  <ItemActions>
+                    <ActionButton 
+                      variant="select" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectionChange('transport', transport);
+                      }}
+                    >
+                      ✓ Seç
+                    </ActionButton>
+                    <ActionButton 
+                      variant="details"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowDetails(transport, 'transport');
+                      }}
+                    >
+                      🔍 Detayları Görüntüle
+                    </ActionButton>
+                  </ItemActions>
+                </ItemContent>
               </SelectionItem>
             ))}
           </SelectionCategory>

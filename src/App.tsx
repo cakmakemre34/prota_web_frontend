@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GlobalStyle } from './styles/GlobalStyles';
 import HomePage from './pages/HomePage';
 import ChatboxPage from './pages/ChatboxPage';
+import SelectionPage from './pages/SelectionPage';
 import RoutesPage from './pages/RoutesPage';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/chatbox" element={<ChatboxPage />} />
+          <Route path="/selection" element={<SelectionPage />} />
           <Route path="/routes" element={<RoutesPage />} />
         </Routes>
       </Router>
