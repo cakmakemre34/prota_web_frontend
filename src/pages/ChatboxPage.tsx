@@ -617,7 +617,7 @@ const ChatboxPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: 'Merhaba! Seyahat planınız için seçimlerinizi yapalım. Sol panelden tercihlerinizi seçin ve benimle konuşarak planınızı detaylandıralım! 🌍',
+      text: 'Merhaba! Ben seyahat planlama asistanınız. Size en uygun seyahat planını oluşturmak için birkaç soru sormak istiyorum. Nereye gitmek istiyorsunuz? 🌍',
       isUser: false,
       timestamp: new Date()
     }
@@ -640,6 +640,28 @@ const ChatboxPage: React.FC = () => {
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Handle returning from selection page for new options
+  useEffect(() => {
+    if (location.state?.requestNewOptions) {
+      const botMessage: Message = {
+        id: Date.now(),
+        text: 'Anladım! Mevcut seçeneklerden memnun değilsiniz. Size yeni seçenekler sunayım. Hangi konuda daha spesifik olmak istiyorsunuz?',
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Reset conversation to gather more specific preferences
+      setConversationStep('destination');
+      setUserPreferences(location.state.preferences || {});
+    }
+  }, [location.state]);
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Sample data with images
   const sampleData = {
@@ -854,24 +876,162 @@ const ChatboxPage: React.FC = () => {
     }, 1500);
   };
 
-  const getBotResponse = (userMessage: string): string => {
+  // Intelligent conversation flow functions
+  const getNextQuestion = (): string => {
+    switch (conversationStep) {
+      case 'destination':
+        return 'Nereye gitmek istiyorsunuz? (Örn: İstanbul, Kapadokya, Antalya)';
+      case 'budget':
+        return 'Bütçeniz nasıl? (Ekonomik / Orta / Lüks)';
+      case 'duration':
+        return 'Kaç günlük bir seyahat planlıyorsunuz?';
+      case 'interests':
+        return 'Hangi aktiviteleri tercih edersiniz? (Kültür, Doğa, Deniz, Şehir hayatı)';
+      case 'accommodation':
+        return 'Konaklama tercihiniz nedir? (Otel, Villa, Hostel, Camping)';
+      case 'food':
+        return 'Yemek tercihleriniz neler? (Geleneksel, Modern, Fast food, Vegetarian)';
+      case 'transport':
+        return 'Ulaşım tercihiniz nedir? (Uçak, Otobüs, Tren, Araba)';
+      case 'travelStyle':
+        return 'Seyahat tarzınız nasıl? (Macera, Rahat, Kültür odaklı, Ekonomik)';
+      default:
+        return 'Başka bir detay eklemek ister misiniz?';
+    }
+  };
+
+  const getSuggestionsForStep = (): string[] => {
+    switch (conversationStep) {
+      case 'destination':
+        return ['İstanbul', 'Kapadokya', 'Antalya', 'Bodrum', 'Trabzon'];
+      case 'budget':
+        return ['Ekonomik', 'Orta', 'Lüks'];
+      case 'duration':
+        return ['1-3 gün', '4-7 gün', '1-2 hafta', '1 ay+'];
+      case 'interests':
+        return ['Kültür', 'Doğa', 'Deniz', 'Şehir hayatı', 'Macera'];
+      case 'accommodation':
+        return ['Otel', 'Villa', 'Hostel', 'Camping'];
+      case 'food':
+        return ['Geleneksel', 'Modern', 'Fast food', 'Vegetarian'];
+      case 'transport':
+        return ['Uçak', 'Otobüs', 'Tren', 'Araba'];
+      case 'travelStyle':
+        return ['Macera', 'Rahat', 'Kültür odaklı', 'Ekonomik'];
+      default:
+        return [];
+    }
+  };
+
+  const processUserInput = (userMessage: string) => {
     const message = userMessage.toLowerCase();
+    
+    // Update preferences based on conversation step
+    switch (conversationStep) {
+      case 'destination':
+        setUserPreferences(prev => ({ ...prev, destination: userMessage }));
+        setConversationStep('budget');
+        break;
+      case 'budget':
+        if (message.includes('ekonomik')) {
+          setUserPreferences(prev => ({ ...prev, budget: 'low' }));
+        } else if (message.includes('orta')) {
+          setUserPreferences(prev => ({ ...prev, budget: 'medium' }));
+        } else if (message.includes('lüks')) {
+          setUserPreferences(prev => ({ ...prev, budget: 'high' }));
+        } else {
+          setUserPreferences(prev => ({ ...prev, budget: userMessage }));
+        }
+        setConversationStep('duration');
+        break;
+      case 'duration':
+        setUserPreferences(prev => ({ ...prev, duration: userMessage }));
+        setConversationStep('interests');
+        break;
+      case 'interests':
+        const interests = userMessage.split(',').map(i => i.trim());
+        setUserPreferences(prev => ({ ...prev, interests }));
+        setConversationStep('accommodation');
+        break;
+      case 'accommodation':
+        setUserPreferences(prev => ({ ...prev, accommodation: userMessage }));
+        setConversationStep('food');
+        break;
+      case 'food':
+        setUserPreferences(prev => ({ ...prev, food: userMessage }));
+        setConversationStep('transport');
+        break;
+      case 'transport':
+        setUserPreferences(prev => ({ ...prev, transport: userMessage }));
+        setConversationStep('travelStyle');
+        break;
+      case 'travelStyle':
+        setUserPreferences(prev => ({ ...prev, travelStyle: userMessage }));
+        setConversationStep('complete');
+        break;
+      default:
+        break;
+    }
+
+    // Check if we have enough information to proceed to selection
+    if (conversationStep === 'complete' || 
+        (userPreferences.destination && userPreferences.budget && userPreferences.duration)) {
+      
+      const botMessage: Message = {
+        id: Date.now(),
+        text: 'Mükemmel! Tercihlerinizi aldım. Şimdi size uygun seçenekleri sunayım. Seçim ekranına yönlendiriliyorsunuz...',
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+
+      setTimeout(() => {
+        navigate('/selection', { state: { preferences: userPreferences } });
+      }, 2000);
+    } else {
+      // Ask next question
+      const nextQuestion = getNextQuestion();
+      const botMessage: Message = {
+        id: Date.now(),
+        text: nextQuestion,
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+    }
+  };
+
+  const getBotResponse = (userMessage: string): string => {
+    // Process user input for conversation flow
+    processUserInput(userMessage);
+    
+    // Return immediate response based on current step
     const selectedCount = Object.values(selections).filter(Boolean).length;
     
     if (selectedCount > 0) {
       return `Harika! ${selectedCount} seçim yaptınız. Bu seçimler hakkında daha fazla bilgi verebilirim. Başka neleri merak ediyorsunuz?`;
     }
     
-    if (message.includes('otel') || message.includes('konaklama')) {
-      return 'Sol panelden otel seçeneklerini inceleyebilirsiniz. Bütçenize ve ihtiyaçlarınıza uygun seçenekler var!';
-    } else if (message.includes('restoran') || message.includes('yemek')) {
-      return 'Restoran seçenekleri sol panelde mevcut. Hangi tür mutfağı tercih edersiniz?';
-    } else if (message.includes('aktivite') || message.includes('gezi')) {
-      return 'Çeşitli aktivite seçenekleri var! Sol panelden hangisi ilginizi çekiyor bakabilirsiniz.';
-    } else if (message.includes('ulaşım') || message.includes('transport')) {
-      return 'Ulaşım seçeneklerini sol panelden görebilirsiniz. Konforunuza ve bütçenize göre seçim yapabilirsiniz.';
-    } else {
-      return 'Sol panelden tercihlerinizi seçin ve seyahat planınızı oluşturalım! Size nasıl yardımcı olabilirim?';
+    // Return contextual response based on conversation step
+    switch (conversationStep) {
+      case 'destination':
+        return 'Harika bir destinasyon seçimi! Şimdi bütçenizi öğrenelim.';
+      case 'budget':
+        return 'Bütçe bilgisi alındı. Seyahat sürenizi belirtelim.';
+      case 'duration':
+        return 'Süre bilgisi alındı. İlgi alanlarınızı öğrenelim.';
+      case 'interests':
+        return 'İlgi alanlarınız kaydedildi. Konaklama tercihinizi belirtelim.';
+      case 'accommodation':
+        return 'Konaklama tercihi alındı. Yemek tercihlerinizi öğrenelim.';
+      case 'food':
+        return 'Yemek tercihleri kaydedildi. Ulaşım tercihinizi belirtelim.';
+      case 'transport':
+        return 'Ulaşım tercihi alındı. Son olarak seyahat tarzınızı öğrenelim.';
+      case 'travelStyle':
+        return 'Mükemmel! Tüm tercihlerinizi aldım. Size uygun seçenekleri hazırlıyorum...';
+      default:
+        return 'Tercihlerinizi toplamaya devam edelim.';
     }
   };
 

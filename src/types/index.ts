@@ -46,3 +46,49 @@ export interface Business {
   updatedAt: string;
 }
 
+// New interfaces for travel planning system
+export interface UserPreferences {
+  destination?: string;
+  budget?: 'low' | 'medium' | 'high' | string;
+  duration?: string;
+  interests?: string[];
+  accommodation?: string;
+  food?: string;
+  transport?: string;
+  travelStyle?: string;
+}
+
+export interface Option {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: 'hotel' | 'restaurant' | 'activity' | 'transport';
+  rating: number;
+  features: string[];
+}
+
+export interface Selections {
+  hotel?: Option;
+  restaurant?: Option;
+  activity?: Option;
+  transport?: Option;
+}
+
+export interface SavedRoute {
+  id: string;
+  preferences: UserPreferences;
+  selections: Selections;
+  totalCost: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: number;
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+}
+
