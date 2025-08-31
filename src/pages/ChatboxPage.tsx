@@ -590,6 +590,14 @@ interface SelectionItem {
   price: string;
   description?: string;
   image: string;
+  images?: string[]; // Added for carousel
+  rating?: number; // Added for rating
+  reviews?: string[]; // Added for reviews
+  openingHours?: string; // Added for opening hours
+  phone?: string; // Added for phone
+  website?: string; // Added for website
+  address?: string; // Added for address
+  amenities?: string[]; // Added for amenities
 }
 
 interface Selections {
@@ -639,6 +647,10 @@ const ChatboxPage: React.FC = () => {
   // Mobile panel visibility state
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   
+  // Business details modal state
+  const [selectedBusiness, setSelectedBusiness] = useState<SelectionItem | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Handle returning from selection page for new options
@@ -671,21 +683,72 @@ const ChatboxPage: React.FC = () => {
         name: 'Grand Palace Hotel', 
         price: '₺2,500/gece', 
         description: '5 yıldızlı lüks otel',
-        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Sultanahmet Mahallesi, Ayasofya Caddesi No:15, Fatih/İstanbul',
+        phone: '+90 212 555 0123',
+        website: 'www.grandpalacehotel.com',
+        rating: 4.8,
+        amenities: ['WiFi', 'Havuz', 'Spa', 'Restoran', 'Bar', 'Otopark', '24/7 Resepsiyon'],
+        openingHours: 'Check-in: 14:00, Check-out: 11:00',
+        reviews: [
+          'Muhteşem manzara ve mükemmel hizmet!',
+          'Çok temiz ve konforlu odalar.',
+          'Personel çok ilgili ve yardımsever.'
+        ]
       },
       { 
         id: 'h2', 
         name: 'City Center Hotel', 
         price: '₺1,200/gece', 
         description: '4 yıldızlı şehir merkezi',
-        image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Beyoğlu Mahallesi, İstiklal Caddesi No:45, Beyoğlu/İstanbul',
+        phone: '+90 212 555 0456',
+        website: 'www.citycenterhotel.com',
+        rating: 4.2,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark', 'Resepsiyon'],
+        openingHours: 'Check-in: 15:00, Check-out: 12:00',
+        reviews: [
+          'Şehir merkezinde ideal konum.',
+          'Fiyat-performans oranı iyi.',
+          'Temiz ve düzenli.'
+        ]
       },
       { 
         id: 'h3', 
         name: 'Budget Inn', 
         price: '₺600/gece', 
         description: '3 yıldızlı ekonomik',
-        image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Kadıköy Mahallesi, Moda Caddesi No:78, Kadıköy/İstanbul',
+        phone: '+90 216 555 0789',
+        website: 'www.budgetinn.com',
+        rating: 3.8,
+        amenities: ['WiFi', 'Ortak Mutfak', 'Çamaşırhane', 'Resepsiyon'],
+        openingHours: 'Check-in: 13:00, Check-out: 10:00',
+        reviews: [
+          'Ekonomik fiyat, temiz oda.',
+          'Genç gezginler için ideal.',
+          'Basit ama işlevsel.'
+        ]
       },
     ],
     restaurants: [
@@ -694,21 +757,67 @@ const ChatboxPage: React.FC = () => {
         name: 'Sunset Restaurant', 
         price: '₺200/kişi', 
         description: 'Deniz manzaralı restoran',
-        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Bodrum Mahallesi, Yalı Caddesi No:10, Bodrum/Muğla',
+        phone: '+90 212 555 0456',
+        website: 'www.sunsetrestaurant.com',
+        rating: 4.5,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 10:00, Check-out: 22:00',
+        reviews: [
+          'Çok lezzetli yemekler, harika manzara!',
+          'Personel çok ilgili ve hizmet veriyor.',
+          'Fiyat-performans oranı iyi.'
+        ]
       },
       { 
         id: 'r2', 
         name: 'Local Taste', 
         price: '₺120/kişi', 
         description: 'Yerel lezzetler',
-        image: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Kadıköy Mahallesi, Moda Caddesi No:15, Kadıköy/İstanbul',
+        phone: '+90 216 555 0123',
+        website: 'www.localtaste.com',
+        rating: 4.0,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 10:00, Check-out: 22:00',
+        reviews: [
+          'Yerel lezzetleri denemek için harika bir yer.',
+          'Fiyat-performans oranı iyi.',
+          'Personel çok ilgili.'
+        ]
       },
       { 
         id: 'r3', 
         name: 'Fast Food Corner', 
         price: '₺60/kişi', 
         description: 'Hızlı servis',
-        image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Beyoğlu Mahallesi, İstiklal Caddesi No:20, Beyoğlu/İstanbul',
+        phone: '+90 212 555 0789',
+        website: 'www.fastfoodcorner.com',
+        rating: 3.9,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 08:00, Check-out: 20:00',
+        reviews: [
+          'Hızlı ve ucuz bir yer.',
+          'Çok iyi bir hizmet.',
+          'Personel çok ilgili.'
+        ]
       },
     ],
     activities: [
@@ -717,21 +826,66 @@ const ChatboxPage: React.FC = () => {
         name: 'Şehir Turu', 
         price: '₺150/kişi', 
         description: 'Rehberli şehir gezisi',
-        image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Sultanahmet Mahallesi, Ayasofya Caddesi No:5, Fatih/İstanbul',
+        phone: '+90 212 555 0123',
+        website: 'www.sehirturu.com',
+        rating: 4.7,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 09:00, Check-out: 18:00',
+        reviews: [
+          'Çok eğlenceli bir gezi.',
+          'Rehber çok bilgili ve yardımcı oldu.',
+          'Fiyat-performans oranı iyi.'
+        ]
       },
       { 
         id: 'a2', 
         name: 'Müze Ziyareti', 
         price: '₺80/kişi', 
         description: 'Tarihi müzeler',
-        image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Beyoğlu Mahallesi, İstiklal Caddesi No:10, Beyoğlu/İstanbul',
+        phone: '+90 212 555 0456',
+        website: 'www.muzeziyareti.com',
+        rating: 4.2,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 09:00, Check-out: 18:00',
+        reviews: [
+          'Tarihi müzeleri ziyaret etmek için harika bir yer.',
+          'Fiyat-performans oranı iyi.',
+          'Personel çok ilgili.'
+        ]
       },
       { 
         id: 'a3', 
         name: 'Tekne Turu', 
         price: '₺300/kişi', 
         description: 'Boğaz turu',
-        image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Bodrum Mahallesi, Yalı Caddesi No:20, Bodrum/Muğla',
+        phone: '+90 212 555 0789',
+        website: 'www.tekneturu.com',
+        rating: 4.6,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 08:00, Check-out: 18:00',
+        reviews: [
+          'Boğaz turu çok eğlenceli.',
+          'Tekne çok temiz ve konforlu.',
+          'Personel çok ilgili.'
+        ]
       },
     ],
     transport: [
@@ -740,21 +894,66 @@ const ChatboxPage: React.FC = () => {
         name: 'Özel Araç', 
         price: '₺800/gün', 
         description: 'Şoförlü araç',
-        image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Sultanahmet Mahallesi, Ayasofya Caddesi No:10, Fatih/İstanbul',
+        phone: '+90 212 555 0123',
+        website: 'www.ozelarac.com',
+        rating: 4.9,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 07:00, Check-out: 20:00',
+        reviews: [
+          'Çok hızlı ve güvenli bir ulaşım.',
+          'Şoför çok bilgili ve yardımcı oldu.',
+          'Fiyat-performans oranı iyi.'
+        ]
       },
       { 
         id: 't2', 
         name: 'Taksi', 
         price: '₺200/mesafe', 
         description: 'Taksi hizmeti',
-        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Beyoğlu Mahallesi, İstiklal Caddesi No:15, Beyoğlu/İstanbul',
+        phone: '+90 212 555 0456',
+        website: 'www.taksi.com',
+        rating: 4.1,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 00:00, Check-out: 24:00',
+        reviews: [
+          'Hızlı ve güvenli bir ulaşım.',
+          'Fiyat-performans oranı iyi.',
+          'Personel çok ilgili.'
+        ]
       },
       { 
         id: 't3', 
         name: 'Toplu Taşıma', 
         price: '₺50/gün', 
         description: 'Otobüs-metro',
-        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=300&h=200&fit=crop&crop=center'
+        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=300&h=200&fit=crop&crop=center',
+        images: [
+          'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&h=500&fit=crop&crop=center',
+          'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&h=500&fit=crop&crop=center'
+        ],
+        address: 'Kadıköy Mahallesi, Moda Caddesi No:10, Kadıköy/İstanbul',
+        phone: '+90 216 555 0789',
+        website: 'www.toplutaşıma.com',
+        rating: 4.0,
+        amenities: ['WiFi', 'Restoran', 'Bar', 'Otopark'],
+        openingHours: 'Check-in: 05:00, Check-out: 23:00',
+        reviews: [
+          'Otobüs-metro çok iyi bir ulaşım.',
+          'Fiyat-performans oranı iyi.',
+          'Personel çok ilgili.'
+        ]
       },
     ]
   };
@@ -809,21 +1008,8 @@ const ChatboxPage: React.FC = () => {
   };
 
   const handleShowDetails = (item: SelectionItem, category: string) => {
-    const categoryNames = {
-      hotel: 'Otel',
-      restaurant: 'Restoran', 
-      activity: 'Aktivite',
-      transport: 'Ulaşım'
-    };
-
-    const botMessage: Message = {
-      id: Date.now(),
-      text: `${categoryNames[category as keyof typeof categoryNames]} detayları: ${item.name} - ${item.price}. ${item.description || 'Daha fazla bilgi için bizimle iletişime geçin!'}`,
-      isUser: false,
-      timestamp: new Date()
-    };
-    
-    setMessages(prev => [...prev, botMessage]);
+    setSelectedBusiness(item);
+    setIsDetailsModalOpen(true);
   };
 
   const handleCompleteSelection = () => {
@@ -1283,9 +1469,560 @@ const ChatboxPage: React.FC = () => {
             </SendButton>
           </InputContainer>
         </GreenChatbox>
+
+        {/* Business Details Modal */}
+        {isDetailsModalOpen && selectedBusiness && (
+          <BusinessDetailsModal
+            business={selectedBusiness}
+            onClose={() => {
+              setIsDetailsModalOpen(false);
+              setSelectedBusiness(null);
+            }}
+          />
+        )}
       </MainContent>
     </ChatboxContainer>
   );
 };
+
+// Business Details Modal Component
+const BusinessDetailsModal: React.FC<{
+  business: SelectionItem;
+  onClose: () => void;
+}> = ({ business, onClose }) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'amenities' | 'reviews'>('overview');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === (business.images?.length || 1) - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? (business.images?.length || 1) - 1 : prev - 1
+    );
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <ModalTitle>{business.name}</ModalTitle>
+          <CloseButton onClick={onClose}>✕</CloseButton>
+        </ModalHeader>
+
+        {/* Image Carousel */}
+        <ImageCarouselContainer>
+          <CarouselImage 
+            src={business.images?.[currentImageIndex] || business.image} 
+            alt={`${business.name} - Fotoğraf ${currentImageIndex + 1}`} 
+          />
+          
+          {/* Navigation Arrows */}
+          {business.images && business.images.length > 1 && (
+            <>
+              <CarouselArrow 
+                direction="left" 
+                onClick={prevImage}
+                aria-label="Önceki fotoğraf"
+              >
+                ‹
+              </CarouselArrow>
+              <CarouselArrow 
+                direction="right" 
+                onClick={nextImage}
+                aria-label="Sonraki fotoğraf"
+              >
+                ›
+              </CarouselArrow>
+            </>
+          )}
+
+          {/* Image Indicators */}
+          {business.images && business.images.length > 1 && (
+            <ImageIndicators>
+              {business.images.map((_, index) => (
+                <ImageIndicator 
+                  key={index}
+                  active={index === currentImageIndex}
+                  onClick={() => goToImage(index)}
+                  aria-label={`Fotoğraf ${index + 1}`}
+                />
+              ))}
+            </ImageIndicators>
+          )}
+
+          {/* Image Counter */}
+          {business.images && business.images.length > 1 && (
+            <ImageCounter>
+              {currentImageIndex + 1} / {business.images.length}
+            </ImageCounter>
+          )}
+        </ImageCarouselContainer>
+        
+        <ModalTabs>
+          <TabButton 
+            active={activeTab === 'overview'} 
+            onClick={() => setActiveTab('overview')}
+          >
+            Genel Bakış
+          </TabButton>
+          <TabButton 
+            active={activeTab === 'amenities'} 
+            onClick={() => setActiveTab('amenities')}
+          >
+            Özellikler
+          </TabButton>
+          <TabButton 
+            active={activeTab === 'reviews'} 
+            onClick={() => setActiveTab('reviews')}
+          >
+            Yorumlar
+          </TabButton>
+        </ModalTabs>
+
+        <ModalBody>
+          {activeTab === 'overview' && (
+            <OverviewTab business={business} />
+          )}
+          {activeTab === 'amenities' && (
+            <AmenitiesTab business={business} />
+          )}
+          {activeTab === 'reviews' && (
+            <ReviewsTab business={business} />
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <ActionButton variant="select" onClick={onClose}>
+            Kapat
+          </ActionButton>
+        </ModalFooter>
+      </ModalContent>
+    </ModalOverlay>
+  );
+};
+
+// Tab Components
+const OverviewTab: React.FC<{ business: SelectionItem }> = ({ business }) => (
+  <TabContent>
+    <InfoSection>
+      <InfoTitle>📍 Adres</InfoTitle>
+      <InfoText>{business.address || 'Adres bilgisi mevcut değil'}</InfoText>
+    </InfoSection>
+    
+    <InfoSection>
+      <InfoTitle>📞 İletişim</InfoTitle>
+      <InfoText>
+        <strong>Telefon:</strong> {business.phone || 'Telefon bilgisi mevcut değil'}<br />
+        <strong>Website:</strong> {business.website ? (
+          <a href={`https://${business.website}`} target="_blank" rel="noopener noreferrer">
+            {business.website}
+          </a>
+        ) : 'Website bilgisi mevcut değil'}
+      </InfoText>
+    </InfoSection>
+
+    <InfoSection>
+      <InfoTitle>⭐ Değerlendirme</InfoTitle>
+      <RatingContainer>
+        <Stars rating={business.rating || 0} />
+        <RatingText>{business.rating || 'N/A'}/5.0</RatingText>
+      </RatingContainer>
+    </InfoSection>
+
+    <InfoSection>
+      <InfoTitle>⏰ Çalışma Saatları</InfoTitle>
+      <InfoText>{business.openingHours || 'Çalışma saati bilgisi mevcut değil'}</InfoText>
+    </InfoSection>
+
+    <InfoSection>
+      <InfoTitle>💰 Fiyat</InfoTitle>
+      <PriceText>{business.price}</PriceText>
+    </InfoSection>
+
+    <InfoSection>
+      <InfoTitle>📝 Açıklama</InfoTitle>
+      <InfoText>{business.description || 'Açıklama bilgisi mevcut değil'}</InfoText>
+    </InfoSection>
+  </TabContent>
+);
+
+const AmenitiesTab: React.FC<{ business: SelectionItem }> = ({ business }) => (
+  <TabContent>
+    <InfoSection>
+      <InfoTitle>✨ Özellikler</InfoTitle>
+      {business.amenities && business.amenities.length > 0 ? (
+        <AmenitiesGrid>
+          {business.amenities.map((amenity, index) => (
+            <AmenityItem key={index}>
+              <AmenityIcon>✓</AmenityIcon>
+              {amenity}
+            </AmenityItem>
+          ))}
+        </AmenitiesGrid>
+      ) : (
+        <InfoText>Özellik bilgisi mevcut değil</InfoText>
+      )}
+    </InfoSection>
+  </TabContent>
+);
+
+const ReviewsTab: React.FC<{ business: SelectionItem }> = ({ business }) => (
+  <TabContent>
+    <InfoSection>
+      <InfoTitle>💬 Müşteri Yorumları</InfoTitle>
+      {business.reviews && business.reviews.length > 0 ? (
+        <ReviewsList>
+          {business.reviews.map((review, index) => (
+            <ReviewItem key={index}>
+              <ReviewText>"{review}"</ReviewText>
+              <ReviewAuthor>- Müşteri {index + 1}</ReviewAuthor>
+            </ReviewItem>
+          ))}
+        </ReviewsList>
+      ) : (
+        <InfoText>Henüz yorum bulunmuyor</InfoText>
+      )}
+    </InfoSection>
+  </TabContent>
+);
+
+// Stars Component
+const Stars: React.FC<{ rating: number }> = ({ rating }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <StarsContainer>
+      {[...Array(fullStars)].map((_, i) => (
+        <Star key={`full-${i}`}>★</Star>
+      ))}
+      {hasHalfStar && <Star>☆</Star>}
+      {[...Array(emptyStars)].map((_, i) => (
+        <Star key={`empty-${i}`}>☆</Star>
+      ))}
+    </StarsContainer>
+  );
+};
+
+// Modal Styled Components
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #e5e7eb;
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  color: ${colors.text};
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #374151;
+  }
+`;
+
+// Image Carousel Components
+const ImageCarouselContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 0;
+`;
+
+const CarouselImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+`;
+
+const CarouselArrow = styled.button<{ direction: 'left' | 'right' }>`
+  position: absolute;
+  top: 50%;
+  ${props => props.direction === 'left' ? 'left: 16px' : 'right: 16px'};
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+`;
+
+const ImageIndicators = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+`;
+
+const ImageIndicator = styled.button<{ active: boolean }>`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: ${props => props.active ? 'white' : 'transparent'};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    background: ${props => props.active ? 'white' : 'rgba(255, 255, 255, 0.5)'};
+    transform: scale(1.2);
+  }
+`;
+
+const ImageCounter = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+`;
+
+const ModalTabs = styled.div`
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+`;
+
+const TabButton = styled.button<{ active: boolean }>`
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: ${props => props.active ? 'white' : 'transparent'};
+  color: ${props => props.active ? colors.primary : '#6b7280'};
+  font-weight: ${props => props.active ? '600' : '500'};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid ${props => props.active ? colors.primary : 'transparent'};
+
+  &:hover {
+    background: ${props => props.active ? 'white' : '#f3f4f6'};
+  }
+`;
+
+const ModalBody = styled.div`
+  padding: 24px;
+  min-height: 300px;
+`;
+
+const ModalFooter = styled.div`
+  padding: 16px 24px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const TabContent = styled.div`
+  animation: fadeIn 0.3s ease-in;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+`;
+
+const InfoSection = styled.div`
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const InfoTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${colors.text};
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const InfoText = styled.div`
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+
+  a {
+    color: ${colors.primary};
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+const RatingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const StarsContainer = styled.div`
+  display: flex;
+  gap: 2px;
+`;
+
+const Star = styled.span`
+  color: #fbbf24;
+  font-size: 20px;
+`;
+
+const RatingText = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${colors.text};
+`;
+
+const PriceText = styled.div`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${colors.primary};
+`;
+
+const AmenitiesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+`;
+
+const AmenityItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: ${colors.text};
+`;
+
+const AmenityIcon = styled.span`
+  color: #10b981;
+  font-weight: bold;
+`;
+
+const ReviewsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const ReviewItem = styled.div`
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border-left: 4px solid ${colors.primary};
+`;
+
+const ReviewText = styled.div`
+  font-size: 14px;
+  color: ${colors.text};
+  font-style: italic;
+  margin-bottom: 8px;
+  line-height: 1.5;
+`;
+
+const ReviewAuthor = styled.div`
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+`;
 
 export default ChatboxPage;

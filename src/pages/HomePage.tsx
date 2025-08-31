@@ -8,6 +8,7 @@ import RecommendedRoutes from '../components/Routes/RecommendedRoutes';
 import LoginModal from '../components/Auth/LoginModal';
 import SignupModal from '../components/Auth/SignupModal';
 import { Destination, Route } from '../types';
+import ChatboxModal from '../components/Chatbox/ChatboxModal';
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -68,6 +69,8 @@ const HomePage: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [chatQuery, setChatQuery] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,8 +82,9 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleSearch = (query: string) => {
-    // ChatboxPage'e query ile yönlendir
-    navigate(`/chatbox?q=${encodeURIComponent(query)}`);
+    // Chatbox modal'ını aç
+    setChatQuery(query);
+    setIsChatModalOpen(true);
   };
 
   const handleDestinationClick = (destination: Destination) => {
@@ -175,6 +179,13 @@ const HomePage: React.FC = () => {
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
         onSwitchToLogin={handleSwitchToLogin}
+      />
+
+      {/* Chatbox Modal */}
+      <ChatboxModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
+        initialQuery={chatQuery}
       />
     </PageContainer>
   );

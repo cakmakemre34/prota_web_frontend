@@ -58,8 +58,8 @@ export const GlobalStyle = createGlobalStyle`
 `;
 
 export const colors = {
-  primary: '#6366f1',
-  primaryDark: '#4f46e5',
+  primary: '#8b9cf6',
+  primaryDark: '#7c3aed',
   secondary: '#f59e0b',
   background: '#ffffff',
   backgroundSecondary: '#f8f9fa',
@@ -69,7 +69,7 @@ export const colors = {
   success: '#10b981',
   warning: '#f59e0b',
   error: '#ef4444',
-  gradient: 'linear-gradient(90deg, #5c6ecf 0%, #6550a3 100%)',
+  gradient: 'linear-gradient(90deg, #8b9cf6 0%, #a78bfa 100%)',
   gradientSecondary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
 };
 
