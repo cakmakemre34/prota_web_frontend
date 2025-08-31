@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { colors, breakpoints } from '../../styles/GlobalStyles';
 
 interface Message {
@@ -19,7 +20,9 @@ const ChatboxModal: React.FC<ChatboxModalProps> = ({ isOpen, onClose, initialQue
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showRouteCreated, setShowRouteCreated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initialQuery) {
@@ -79,6 +82,12 @@ const ChatboxModal: React.FC<ChatboxModalProps> = ({ isOpen, onClose, initialQue
       };
 
       setMessages(prev => [...prev, botMessage]);
+
+      // Rota oluşturuldu mu kontrol et
+      if (data.response.includes('rotanız hazırlandı') || data.response.includes('Planlanan Rotalar')) {
+        setShowRouteCreated(true);
+      }
+
     } catch (error) {
       console.error('API Hatası:', error);
       
@@ -120,6 +129,11 @@ const ChatboxModal: React.FC<ChatboxModalProps> = ({ isOpen, onClose, initialQue
     }
   };
 
+  const handleViewRoutes = () => {
+    navigate('/planned-routes');
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -156,6 +170,15 @@ const ChatboxModal: React.FC<ChatboxModalProps> = ({ isOpen, onClose, initialQue
             
             <div ref={messagesEndRef} />
           </MessagesContainer>
+
+          {showRouteCreated && (
+            <RouteCreatedBanner>
+              <BannerText>🎉 Rotanız hazırlandı!</BannerText>
+              <BannerButton onClick={handleViewRoutes}>
+                🗺️ Rotalarım Sayfasına Git
+              </BannerButton>
+            </RouteCreatedBanner>
+          )}
 
           <InputContainer>
             <ChatInput
@@ -331,6 +354,50 @@ const TypingDot = styled.div`
       transform: scale(1);
       opacity: 1;
     }
+  }
+`;
+
+const RouteCreatedBanner = styled.div`
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 20px;
+  margin: 0 20px;
+  border-radius: 15px;
+  text-align: center;
+  animation: bannerSlideIn 0.5s ease-out;
+
+  @keyframes bannerSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const BannerText = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+`;
+
+const BannerButton = styled.button`
+  background: white;
+  color: #10b981;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f9fafb;
+    transform: translateY(-2px);
   }
 `;
 

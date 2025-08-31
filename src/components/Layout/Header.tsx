@@ -298,7 +298,7 @@ const Header: React.FC<HeaderProps> = ({
           >
             Ana Sayfa
           </NavLink>
-          <NavLink onClick={() => navigate('/routes')} isScrolled={isScrolled}>
+          <NavLink onClick={() => navigate('/planned-routes')} isScrolled={isScrolled}>
             Rotalarım
           </NavLink>
           <NavLink onClick={() => handleNavigation('#group-travel')} isScrolled={isScrolled}>

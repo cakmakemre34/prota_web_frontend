@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import ChatboxPage from './pages/ChatboxPage';
 import SelectionPage from './pages/SelectionPage';
 import RoutesPage from './pages/RoutesPage';
+import PlannedRoutesPage from './pages/PlannedRoutesPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/chatbox" element={<ChatboxPage />} />
           <Route path="/selection" element={<SelectionPage />} />
           <Route path="/routes" element={<RoutesPage />} />
+          <Route path="/planned-routes" element={<PlannedRoutesPage />} />
         </Routes>
       </Router>
     </>
